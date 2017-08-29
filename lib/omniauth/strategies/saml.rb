@@ -183,8 +183,27 @@ module OmniAuth
 
           # Generate a response to the IdP.
           logout_request_id = logout_request.id
-          logout_response = OneLogin::RubySaml::SloLogoutresponse.new.create(settings, logout_request_id, nil, RelayState: slo_relay_state)
-          redirect(logout_response)
+          
+          if settings.single_logout_service_binding == "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+            logout_response = OneLogin::RubySaml::SloLogoutresponse.new.create_params(settings, logout_request_id, nil, RelayState: slo_relay_state)
+
+            saml_response = logout_response.delete("SAMLResponse")
+            html = []
+            html << '<html>'
+            html << '<head><title>Shibboleth Authentication Request</title></head>'
+            html << '<body onload="document.forms[0].submit()">'
+            html << '  <form method="POST" action="'+settings.idp_slo_target_url+'">'
+            html << '    <input type="hidden" name="SAMLResponse" value="'+saml_response+'"/>'
+            html << '</form> </body> </html>'
+
+            r = Rack::Response.new(
+              html.join("")
+            )
+            r.finish
+          else
+            logout_response = OneLogin::RubySaml::SloLogoutresponse.new.create(settings, logout_request_id, nil, RelayState: slo_relay_state)
+            redirect(logout_response)
+          end
         else
           raise OmniAuth::Strategies::SAML::ValidationError.new("SAML failed to process LogoutRequest")
         end
