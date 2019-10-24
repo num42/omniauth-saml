@@ -10,7 +10,7 @@ module OmniAuth
         OmniAuth::Strategy.included(subclass)
       end
 
-      OTHER_REQUEST_OPTIONS = [:skip_conditions, :allowed_clock_drift, :matches_request_id, :skip_subject_confirmation].freeze
+      RUBYSAML_RESPONSE_OPTIONS = OneLogin::RubySaml::Response::AVAILABLE_OPTIONS
 
       option :name_identifier_format, nil
       option :idp_sso_target_url_runtime_params, {}
@@ -69,7 +69,7 @@ module OmniAuth
       end
 
       def other_phase
-        if current_path.start_with?(request_path)
+        if request_path_pattern.match(current_path)
           @env['omniauth.strategy'] ||= self
           setup_phase
 
@@ -119,6 +119,10 @@ module OmniAuth
       end
 
       private
+
+      def request_path_pattern
+        @request_path_pattern ||= %r{\A#{Regexp.quote(request_path)}(/|\z)}
+      end
 
       def on_subpath?(subpath)
         on_path?("#{request_path}/#{subpath}")
@@ -246,7 +250,7 @@ module OmniAuth
 
       def options_for_response_object
         # filter options to select only extra parameters
-        opts = options.select {|k,_| OTHER_REQUEST_OPTIONS.include?(k.to_sym)}
+        opts = options.select {|k,_| RUBYSAML_RESPONSE_OPTIONS.include?(k.to_sym)}
 
         # symbolize keys without activeSupport/symbolize_keys (ruby-saml use symbols)
         opts.inject({}) do |new_hash, (key, value)|

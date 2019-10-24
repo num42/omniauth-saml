@@ -1,3 +1,32 @@
+<a name="v1.10.1"></a>
+### v1.10.1 (2018-06-07)
+
+
+#### Features
+
+* **saml-response**
+  * whitelist more response options	 ([575198d](/../../commit/575198d))
+
+
+<a name="v1.10.0"></a>
+### v1.10.0 (2018-02-19)
+
+
+#### Bug Fixes
+
+* ambiguous path match in other phase	 ([1b465b9](/../../commit/1b465b9))
+* Update ruby-saml gem to 1.7 or later to fix CVE-2017-11430 ([6bc28ad](/../../commit/6bc28ad))
+
+
+<a name="v1.9.0"></a>
+### v1.9.0 (2018-01-29)
+
+
+#### Bug Fixes
+
+* Update omniauth gem to 1.3.2 or later 1.3.x	 ([b6bb425](/../../commit/b6bb425))
+
+
 <a name="v1.8.1"></a>
 ### v1.8.1 (2017-06-22)
 
